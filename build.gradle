@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'scala'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url 'http://repository.codehaus.org/org/codehaus/groovy'
+    }
+}
+
+dependencies {
+    compile gradleApi()
+    compile "com.twitter:scrooge-generator_2.10:${scroogeVersion}"
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile "org.scala-lang:scala-library:${scalaVersion}"
+    testCompile ('org.spockframework:spock-core:0.7-groovy-1.8') {
+        exclude module: "groovy-all"
+    }
+}
