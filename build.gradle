@@ -1,7 +1,10 @@
+import org.gradle.api.artifacts.maven.MavenDeployment
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'scala'
+apply plugin: 'signing'
 
 repositories {
     mavenCentral()
@@ -18,5 +21,65 @@ dependencies {
     compile "org.scala-lang:scala-library:${scalaVersion}"
     testCompile ('org.spockframework:spock-core:0.7-groovy-1.8') {
         exclude module: "groovy-all"
+    }
+}
+
+task scaladocsJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/scaladocs'
+}
+
+task sourcesJar(type: Jar){
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives scaladocsJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'Scrooge Gradle Plugin'
+                packaging 'jar'
+                description 'Scrooge Gradle Plugin is a gradle plugin for generating scala files from thrift'
+                url 'https://github.com/iamsteveholmes/scrooge-gradle-plugin/'
+
+                scm {
+                    url 'scm:git@github.com:iamsteveholmes/scrooge-gradle-plugin.git'
+                    connection 'scm:git@github.com:iamsteveholmes/scrooge-gradle-plugin.git'
+                    developerConnection 'scm:git@github.com:iamsteveholmes/scrooge-gradle-plugin.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://opensource.org/licenses/MIT'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'iamsteveholmes'
+                        name 'Steve Holmes'
+                    }
+                }
+            }
+        }
     }
 }

@@ -27,9 +27,6 @@ class ScroogeCompileTask extends DefaultTask {
     def compile() {
         val destination = getDest.getAbsolutePath
         val thriftFiles = _files.asScala.map{_.getAbsolutePath}
-        println("compiling")
-        println(destination)
-        println(thriftFiles.size)
         thriftFiles.foreach(println)
         val compiler = new Compiler()
         compiler.destFolder = destination
