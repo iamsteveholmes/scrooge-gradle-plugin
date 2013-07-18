@@ -16,9 +16,15 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile "com.twitter:scrooge-generator_2.10:${scroogeVersion}"
-    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile "org.scala-lang:scala-library:${scalaVersion}"
+    compile("com.twitter:scrooge-generator_2.10:${scroogeVersion}") {
+        transitive = true
+    }
+    compile("org.codehaus.groovy:groovy-all:${groovyVersion}") {
+        transitive = true
+    }
+    compile("org.scala-lang:scala-library:${scalaVersion}") {
+        transitive = true
+    }
     testCompile ('org.spockframework:spock-core:0.7-groovy-1.8') {
         exclude module: "groovy-all"
     }
