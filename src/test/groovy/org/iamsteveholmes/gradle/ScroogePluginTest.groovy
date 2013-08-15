@@ -42,4 +42,25 @@ class ScroogePluginTest extends Specification {
         }
         count == 2
     }
+
+    def "compile builds 2 scala files with finagle options set"() {
+
+        given:
+        ScroogeCompileTask compileScrooge = project.tasks.compileScrooge
+        compileScrooge.dest = destinationDirectory
+        compileScrooge.thriftFiles = thriftDirectory.listFiles().toList()
+        compileScrooge.opts = ["-finagle"]
+
+        when:
+        compileScrooge.compile()
+
+        then: "There should be two scala files generated"
+        def count = 0
+        destinationDirectory.traverse(
+                type: FileType.FILES,
+                nameFilter: ~/.*\.scala/){ File file ->
+            count++
+        }
+        count == 2
+    }
 }

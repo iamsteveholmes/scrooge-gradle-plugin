@@ -1,26 +1,39 @@
 package org.iamsteveholmes.gradle
 
-import org.gradle.api.tasks.{InputFiles, OutputDirectory, TaskAction}
+import org.gradle.api.tasks._
 import java.io.File
 import com.twitter.scrooge.{Main, Compiler}
-import scala.collection.JavaConverters._
+import _root_.scala.collection.JavaConverters._
 import org.gradle.api.DefaultTask
+import java.util
 
 class ScroogeCompileTask extends DefaultTask {
 
     private var _dest: File = _
     private var _files: java.lang.Iterable[File] = _
-    def getDest = _dest
-    def getThriftFiles = _files
+    private var _opts: java.lang.Iterable[String] = new util.ArrayList()
 
     @OutputDirectory
+    def getDest = _dest
+
     def setDest(destinationDirectory: File) {
         _dest = destinationDirectory
     }
 
     @InputFiles
+    def getThriftFiles = _files
+
     def setThriftFiles(files: java.lang.Iterable[File]) {
         _files = files
+    }
+
+
+    @Input
+    @Optional
+    def getOpts = _opts
+
+    def setOpts(options: java.lang.Iterable[String]) {
+        this._opts = options
     }
 
     @TaskAction
@@ -31,7 +44,8 @@ class ScroogeCompileTask extends DefaultTask {
         val compiler = new Compiler()
         compiler.destFolder = destination
 
-        Main.parseOptions( compiler, thriftFiles.toSeq)
+        val args: Seq[String] = _opts.asScala.toSeq ++ thriftFiles.toSeq
+        Main.parseOptions(compiler, args)
         compiler.run()
     }
 }
