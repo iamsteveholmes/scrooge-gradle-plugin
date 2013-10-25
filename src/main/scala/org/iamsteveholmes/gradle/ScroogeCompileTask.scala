@@ -9,9 +9,9 @@ import java.util
 
 class ScroogeCompileTask extends DefaultTask {
 
-    private var _dest: File = _
-    private var _files: java.lang.Iterable[File] = _
-    private var _opts: java.lang.Iterable[String] = new util.ArrayList()
+    private var _dest: File = new File("src/gen/scala/")
+    private var _files: java.lang.Iterable[File] = util.Arrays.asList(new File("src/main/thrift/"))
+    private var _opts: java.lang.Iterable[String] = util.Arrays.asList("--finagle")
 
     @OutputDirectory
     def getDest = _dest
