@@ -1,17 +1,19 @@
-package org.iamsteveholmes.gradle
+package se.rosenhorn.scrooge
 
 import org.gradle.api.tasks._
 import java.io.File
 
 import com.twitter.scrooge.{Compiler, Main}
 import com.typesafe.scalalogging.LazyLogging
+
 import _root_.scala.collection.JavaConverters._
-import org.gradle.api.DefaultTask
+import org.gradle.api.{DefaultTask, GradleException}
 import java.lang
 
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.collections.SimpleFileCollection
 
+@CacheableTask
 class ScroogeCompileTask extends DefaultTask with LazyLogging {
     // needs to be lazy so that the correct options is grabbed at runtime
     private lazy val pluginExtensions: ScroogePluginExtention = getProject.getExtensions
@@ -28,6 +30,7 @@ class ScroogeCompileTask extends DefaultTask with LazyLogging {
         new File(s"${getProject.getProjectDir.getAbsolutePath}/${pluginExtensions.getTargetDir}")
     }
 
+    @PathSensitive(PathSensitivity.NAME_ONLY)
     @InputFiles
     def getSourceFiles: FileCollection = {
         val files = CompilerHelper.recursiveListFiles(getSourceDir)
@@ -53,14 +56,19 @@ object CompilerHelper extends LazyLogging {
     def compile(targetDir: File, opts: Seq[String], sourceDir: File): Unit = {
         val sourceFiles = recursiveListFiles(sourceDir).map (entry => {
             val absPath = entry.getAbsolutePath
-            logger.debug(s"Compiling $absPath")
+            logger.info(s"Compiling $absPath")
             absPath
         })
 
-        val compiler = new Compiler()
-        compiler.destFolder = targetDir.getAbsolutePath
-        val args: Seq[String] = opts ++ sourceFiles
-        Main.parseOptions(compiler, args)
-        compiler.run()
+        try {
+            val compiler = new Compiler()
+            compiler.destFolder = targetDir.getAbsolutePath
+            val args: Seq[String] = opts ++ sourceFiles
+            Main.parseOptions(compiler, args)
+            compiler.run()
+        } catch {
+            case e: Exception =>
+                throw new GradleException(e.getMessage, e)
+        }
     }
 }

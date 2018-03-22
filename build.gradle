@@ -32,20 +32,20 @@ artifacts {
 gradlePlugin {
     plugins {
         scalapbPlugin {
-            id = 'org.iamsteveholmes.gradle'
-            implementationClass = 'org.iamsteveholmes.gradle.ScroogePlugin'
+            id = 'se.rosenhorn.scrooge'
+            implementationClass = 'se.rosenhorn.scrooge.ScroogePlugin'
         }
     }
 }
 
 pluginBundle {
-    website = 'https://github.com/iamsteveholmes/scrooge-gradle-plugin/'
-    vcsUrl = 'git@github.com:iamsteveholmes/scrooge-gradle-plugin.git'
+    website = 'https://github.com/hrosenhorn/scrooge-gradle-plugin'
+    vcsUrl = 'git@github.com:hrosenhorn/scrooge-gradle-plugin.git'
     tags = ['scala', 'thrift', 'scrooge', 'finagle']
 
     plugins {
         scalapbPlugin {
-            id = 'org.iamsteveholmes.gradle'
+            id = 'se.rosenhorn.scrooge'
             displayName = 'Scrooge Gradle Plugin'
             description = 'Scrooge Gradle Plugin is a gradle plugin for generating scala files from thrift'
         }

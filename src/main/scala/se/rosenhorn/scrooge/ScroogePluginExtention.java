@@ -1,4 +1,4 @@
-package org.iamsteveholmes.gradle;
+package se.rosenhorn.scrooge;
 
 import java.util.ArrayList;
 import java.util.Arrays;

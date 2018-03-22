@@ -1,4 +1,4 @@
-package org.iamsteveholmes.gradle
+package se.rosenhorn.scrooge
 
 import org.gradle.api.{Plugin, Project}
 
