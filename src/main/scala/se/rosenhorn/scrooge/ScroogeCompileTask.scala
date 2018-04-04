@@ -12,6 +12,7 @@ import java.lang
 
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.collections.SimpleFileCollection
+import sbt.io.IO
 
 @CacheableTask
 class ScroogeCompileTask extends DefaultTask with LazyLogging {
@@ -54,6 +55,10 @@ object CompilerHelper extends LazyLogging {
     }
 
     def compile(targetDir: File, opts: Seq[String], sourceDir: File): Unit = {
+        logger.debug(s"Removing old generated files in ${targetDir.getAbsolutePath}")
+        IO.delete(targetDir)
+        targetDir.mkdir()
+
         val sourceFiles = recursiveListFiles(sourceDir).map (entry => {
             val absPath = entry.getAbsolutePath
             logger.info(s"Compiling $absPath")

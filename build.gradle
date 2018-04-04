@@ -17,6 +17,7 @@ dependencies {
     testCompile "org.scalatest:scalatest_${scalaLevel}:3.0.1"
     compile "com.twitter:scrooge-generator_${scalaLevel}:${scroogeVersion}"
     compile "org.scala-lang:scala-library:${scalaVersion}"
+    compile "org.scala-sbt:io_${scalaLevel}:1.1.0"
     compile "com.typesafe.scala-logging:scala-logging_${scalaLevel}:3.7.2"
 }
 
