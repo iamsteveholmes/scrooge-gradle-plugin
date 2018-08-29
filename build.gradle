@@ -1,91 +1,66 @@
-import org.gradle.api.artifacts.maven.MavenDeployment
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'scala'
-apply plugin: 'signing'
+plugins {
+    id 'scala'
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.9.9'
+}
 
 repositories {
     mavenCentral()
     mavenLocal()
-    maven {
-        url 'http://repository.codehaus.org/org/codehaus/groovy'
-    }
 }
 
 dependencies {
     compile gradleApi()
-    compile("com.twitter:scrooge-generator_2.10:${scroogeVersion}") {
-        transitive = true
-    }
-    compile("org.codehaus.groovy:groovy-all:${groovyVersion}") {
-        transitive = true
-    }
-    compile("org.scala-lang:scala-library:${scalaVersion}") {
-        transitive = true
-    }
-    testCompile ('org.spockframework:spock-core:0.7-groovy-1.8') {
-        exclude module: "groovy-all"
-    }
+
+    testCompile "org.scalatest:scalatest_${scalaLevel}:3.0.1"
+    compile "com.twitter:scrooge-generator_${scalaLevel}:${scroogeVersion}"
+    compile "org.scala-lang:scala-library:${scalaVersion}"
+    compile "org.scala-sbt:io_${scalaLevel}:1.1.0"
+    compile "com.typesafe.scala-logging:scala-logging_${scalaLevel}:3.7.2"
 }
 
-task scaladocsJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/scaladocs'
-}
-
-task sourcesJar(type: Jar){
+task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
 }
 
 artifacts {
-    archives jar
-    archives scaladocsJar
     archives sourcesJar
 }
 
-signing {
-    sign configurations.archives
+gradlePlugin {
+    plugins {
+        scalapbPlugin {
+            id = 'se.rosenhorn.scrooge'
+            implementationClass = 'se.rosenhorn.scrooge.ScroogePlugin'
+        }
+    }
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+pluginBundle {
+    website = 'https://github.com/hrosenhorn/scrooge-gradle-plugin'
+    vcsUrl = 'git@github.com:hrosenhorn/scrooge-gradle-plugin.git'
+    tags = ['scala', 'thrift', 'scrooge', 'finagle']
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
+    plugins {
+        scalapbPlugin {
+            id = 'se.rosenhorn.scrooge'
+            displayName = 'Scrooge Gradle Plugin'
+            description = 'Scrooge Gradle Plugin is a gradle plugin for generating scala files from thrift'
+        }
+    }
+}
 
-            pom.project {
-                name 'Scrooge Gradle Plugin'
-                packaging 'jar'
-                description 'Scrooge Gradle Plugin is a gradle plugin for generating scala files from thrift'
-                url 'https://github.com/iamsteveholmes/scrooge-gradle-plugin/'
-
-                scm {
-                    url 'scm:git@github.com:iamsteveholmes/scrooge-gradle-plugin.git'
-                    connection 'scm:git@github.com:iamsteveholmes/scrooge-gradle-plugin.git'
-                    developerConnection 'scm:git@github.com:iamsteveholmes/scrooge-gradle-plugin.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The MIT License (MIT)'
-                        url 'http://opensource.org/licenses/MIT'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'iamsteveholmes'
-                        name 'Steve Holmes'
-                    }
-                }
-            }
+// Plugin publication
+publishing {
+    publications {
+        pluginPublication (MavenPublication) {
+            from        components.java
+            groupId     project.group
+            artifactId  project.name
+            version     project.version
         }
     }
 }
